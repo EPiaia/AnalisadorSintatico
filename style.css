@@ -1,0 +1,49 @@
+.topbar {
+    background-color: purple;
+    color: white;
+    height: 80px;
+    align-items: center;
+}
+
+.input-field {
+    width: 100%;
+    margin-bottom: 5px;
+    height: 35px;
+    font-size: 15px;
+}
+
+.header-btn {
+    width: 120px;
+    height: 35px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    background-color: purple;
+    color: white;
+    border-radius: 5px;
+}
+
+.parsing-table table {
+    width: 100%;
+}
+
+.parsing-table table thead tr th {
+    border: 1px solid black;
+    text-align: center;
+    background-color: purple;
+    color: white;
+}
+
+.parsing-table table tbody tr:nth-child(odd) {
+    background-color: rgb(178 108 178);
+}
+
+#restart-btn {
+    width: 120px;
+    height: 35px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    background-color: purple;
+    color: white;
+    border-radius: 5px;
+    margin-top: 10px;
+}
