@@ -35,9 +35,11 @@
             <div class="col-3">
                 <input id="word-input" class="input-field" />
             </div>
-            <div class="col-3">
+            <div class="col-5">
                 <button id="generate-btn" class="header-btn">Gerar</button>
                 <button id="execute-btn" class="header-btn">Executar</button>
+                <button id="step-by-step-btn" class="header-btn">Passo a passo</button>
+                <button id="more-info-btn" class="big-header-btn">Mais Informações</button>
             </div>
         </div>
 
@@ -60,7 +62,82 @@
         </div>
     </div>
 
-    </div>
+    <dialog id="more-information">
+        <div class="row">
+            <div class="col-6">
+                <h3>Gramática</h3>
+                <hr />
+                S::= cBb | bCa | abC <br />
+                A::= aCb | cBC | bB <br />
+                B::= acA |  ε <br />
+                C::= cb  | bcS <br />
+            </div>
+            <div class="col-6">
+                <h3>Tabela de Parsing</h3>
+                <hr />
+                <table class="parsing-table-info">
+                    <thead>
+                        <tr>
+                            <th>δ</th>
+                            <th>a</th>
+                            <th>b</th>
+                            <th>c</th>
+                            <th>$</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td>S</td>
+                            <td>S -> abC</td>
+                            <td>S -> bCa</td>
+                            <td>S -> cBb</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>A</td>
+                            <td>A -> aCb</td>
+                            <td>A -> bB</td>
+                            <td>A -> cBC</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td>B -> acA</td>
+                            <td>B -> ε</td>
+                            <td>B -> ε</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>C</td>
+                            <td></td>
+                            <td>C -> bcS</td>
+                            <td>C -> cb</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br />
+            </div>
+            <div class="col-6">
+                <h3>Conjunto First</h3>
+                <hr />
+                S - c, b, a <br />
+                A - a, c, b <br />
+                B - a, ε <br />
+                C - c, b <br />
+            </div>
+            <div class="col-6">
+                <h3>Conjunto Follow</h3>
+                <hr />
+                S - $, a, b, c <br />
+                A - b, c <br />
+                B - b, c <br />
+                C - a, b, $, c <br />
+            </div>
+        </div>
+        <button onclick="document.getElementById('more-information').close()" class="header-btn close-btn">Fechar</button>
+    </dialog>
 </body>
 
 </html>

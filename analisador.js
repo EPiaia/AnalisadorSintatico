@@ -18,8 +18,13 @@ window.addEventListener('load', (event) => {
         execute();
         createRestart();
     });
+
     document.getElementById('generate-btn').addEventListener('click', () => {
         generateToken();
+    });
+
+    document.getElementById('more-info-btn').addEventListener('click', () => {
+        document.getElementById('more-information').showModal();
     });
 });
 

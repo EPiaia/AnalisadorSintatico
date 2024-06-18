@@ -22,6 +22,16 @@
     border-radius: 5px;
 }
 
+.big-header-btn {
+    width: 200px;
+    height: 35px;
+    margin-bottom: 5px;
+    font-size: 15px;
+    background-color: purple;
+    color: white;
+    border-radius: 5px;
+}
+
 .parsing-table table {
     width: 100%;
 }
@@ -46,4 +56,32 @@
     color: white;
     border-radius: 5px;
     margin-top: 10px;
+}
+
+#more-information {
+    width: 850px;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.close-btn {
+    float: right;
+}
+
+.parsing-table-info thead tr th {
+    border: 1px solid black;
+    text-align: center;
+    background-color: purple;
+    color: white;
+    min-width: 80px;
+}
+
+.parsing-table-info tbody tr:nth-child(odd) {
+    background-color: rgb(178 108 178);
+}
+
+.parsing-table-info tbody tr td {
+    text-align: center;
 }
