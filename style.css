@@ -85,3 +85,7 @@
 .parsing-table-info tbody tr td {
     text-align: center;
 }
+
+.display-none {
+    display: none;
+}

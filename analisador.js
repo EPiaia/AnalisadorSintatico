@@ -4,6 +4,7 @@ const rules = ['S', 'A', 'B', 'C'];
 const stackes = [];
 const entries = [];
 const actions = [];
+var actualIteration = 0;
 const PARSING_TABLE_BODY_ID = 'parsing-table-body';
 const TOKEN_LENGTH_RATE = 0.75;
 
@@ -26,6 +27,21 @@ window.addEventListener('load', (event) => {
     document.getElementById('more-info-btn').addEventListener('click', () => {
         document.getElementById('more-information').showModal();
     });
+
+    document.getElementById('step-by-step-btn').addEventListener('click', () => {
+        restart(false);
+        turnStepByStepMode();
+    });
+   
+    document.getElementById('next-step-btn').addEventListener('click', () => {
+        nextStep();
+    });
+    
+    document.getElementById('end-step-btn').addEventListener('click', () => {
+        endStepByStep();
+        leaveStepByStepMode();
+        createRestart();
+    });
 });
 
 function initializeMaps() {
@@ -36,59 +52,103 @@ function initializeMaps() {
 }
 
 function execute() {
+    initializeExecution();
+
+    var continueParsing = true;
+    while (continueParsing) {
+        continueParsing = executeStep();
+        if (!continueParsing) {
+            break;
+        }
+    }
+
+    writeParsingTable();
+}
+
+function initializeExecution() {
     var input = document.getElementById('word-input');
     var word = input.value + '$';
     stackes.push('$S');
     entries.push(word);
+}
 
-    let count = 0;
-    while (true) {
-        var stack = stackes[count];
-        var entry = entries[count];
+function nextStep() {
+    if (actualIteration === 0) {
+        initializeExecution();
+    }
 
-        if (stack === '$' && entry === '$') {
-            actions.push('OK em ' + stackes.length + ' iterações');
+    var continueParsing = executeStep();
+    writeParsingTable();
+
+    if (!continueParsing) {
+        leaveStepByStepMode();
+        createRestart();
+    }
+}
+
+function endStepByStep() {
+    if (actualIteration === 0) {
+        initializeExecution();
+    }
+
+    var continueParsing = true;
+    while (continueParsing) {
+        continueParsing = executeStep();
+        if (!continueParsing) {
             break;
         }
-
-        count++;
-
-        var stackRule = stack.split('').pop();
-        var entryChar = Array.from(entry)[0];
-        if (stackRule === entryChar) {
-            actions.push('Ler ' + entryChar);
-            stackes.push(stack.substring(0, stack.length - 1));
-            entries.push(entry.substring(1));
-            continue;
-        }
-
-        var sentenceRule = rule(stackRule, entryChar);
-        if (sentenceRule === null) {
-            actions.push('Erro em ' + stackes.length + ' iterações');
-            break;
-        }
-
-        // epsilon
-        if (sentenceRule === '-') {
-            actions.push(entryChar + ' -> ε');
-            stackes.push(stack.substring(0, stack.length - 1));
-            entries.push(entry);
-            continue;
-        }
-
-        actions.push(entryChar + ' -> ' + sentenceRule);
-        sentenceRule = sentenceRule.split('').reverse().join('');
-        stackes.push(stack.substring(0, stack.length - 1) + sentenceRule);
-        entries.push(entry);
     }
 
     writeParsingTable();
+}
+
+function executeStep() {
+    var stack = stackes[actualIteration];
+    var entry = entries[actualIteration];
+
+    if (stack === '$' && entry === '$') {
+        actions.push('OK em ' + stackes.length + ' iterações');
+        return false;
+    }
+
+    actualIteration++;
+
+    var stackRule = stack.split('').pop();
+    var entryChar = Array.from(entry)[0];
+    if (stackRule === entryChar) {
+        actions.push('Ler ' + entryChar);
+        stackes.push(stack.substring(0, stack.length - 1));
+        entries.push(entry.substring(1));
+        return true;
+    }
+
+    var sentenceRule = rule(stackRule, entryChar);
+    if (sentenceRule === null) {
+        actions.push('Erro em ' + stackes.length + ' iterações');
+        return false;
+    }
+
+    // Epsilon
+    if (sentenceRule === '-') {
+        actions.push(entryChar + ' -> ε');
+        stackes.push(stack.substring(0, stack.length - 1));
+        entries.push(entry);
+        return true;
+    }
+
+    actions.push(entryChar + ' -> ' + sentenceRule);
+    sentenceRule = sentenceRule.split('').reverse().join('');
+    stackes.push(stack.substring(0, stack.length - 1) + sentenceRule);
+    entries.push(entry);
+
+    return true;
 }
 
 function restart(clearInput) {
     stackes.splice(0, stackes.length);
     entries.splice(0, entries.length);
     actions.splice(0, actions.length);
+    actualIteration = 0;
 
     if (clearInput) {
         var input = document.getElementById('word-input');
@@ -187,6 +247,20 @@ function rule(key, char) {
     return sentenceRule;
 }
 
+function turnStepByStepMode() {
+    document.getElementById('execute-btn').className = 'header-btn display-none';
+    document.getElementById('step-by-step-btn').className = 'header-btn display-none';
+    document.getElementById('next-step-btn').className = 'header-btn';
+    document.getElementById('end-step-btn').className = 'header-btn';
+}
+
+function leaveStepByStepMode() {
+    document.getElementById('execute-btn').className = 'header-btn';
+    document.getElementById('step-by-step-btn').className = 'header-btn';
+    document.getElementById('next-step-btn').className = 'header-btn display-none';
+    document.getElementById('end-step-btn').className = 'header-btn display-none';
+}
+
 function writeParsingTable() {
     var parsingTable = document.getElementById('parsing-table');
 
@@ -218,6 +292,9 @@ function writeParsingTable() {
 
 function createCell(value) {
     var td = document.createElement('td');
+    if (typeof (value) === 'undefined' || value === null) {
+        value = '';
+    }
     var text = document.createTextNode(value);
     td.appendChild(text);
     return td;
