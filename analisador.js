@@ -4,13 +4,22 @@ const rules = ['S', 'A', 'B', 'C'];
 const stackes = [];
 const entries = [];
 const actions = [];
-const parsingTableBodyId = 'parsing-table-body'
+const PARSING_TABLE_BODY_ID = 'parsing-table-body';
+const TOKEN_LENGTH_RATE = 0.75;
 
 window.addEventListener('load', (event) => {
     initializeMaps();
     document.getElementById('execute-btn').addEventListener('click', () => {
+        var input = document.getElementById('word-input');
+        if (input.value === '') {
+            return;
+        }
+        restart(false);
         execute();
         createRestart();
+    });
+    document.getElementById('generate-btn').addEventListener('click', () => {
+        generateToken();
     });
 });
 
@@ -71,14 +80,20 @@ function execute() {
     writeParsingTable();
 }
 
-function restart() {
+function restart(clearInput) {
     stackes.splice(0, stackes.length);
     entries.splice(0, entries.length);
     actions.splice(0, actions.length);
-    var input = document.getElementById('word-input');
-    input.value = '';
 
-    document.getElementById('restart-btn').remove();
+    if (clearInput) {
+        var input = document.getElementById('word-input');
+        input.value = '';
+    }
+
+    var btn = document.getElementById('restart-btn');
+    if (typeof (btn) != 'undefined' && btn != null) {
+        document.getElementById('restart-btn').remove();
+    }
     writeParsingTable();
 }
 
@@ -87,12 +102,65 @@ function createRestart() {
     var btn = document.createElement('button');
     btn.id = 'restart-btn';
     btn.addEventListener('click', () => {
-        restart();
+        restart(true);
     });
 
-    var text = document.createTextNode("Reiniciar");
+    var text = document.createTextNode('Reiniciar');
     btn.appendChild(text);
     div.appendChild(btn);
+}
+
+function generateToken() {
+    var tokenInput = document.getElementById('word-input');
+    tokenInput.value = generateTokenFromRule('S');
+}
+
+function generateTokenFromRule(rule) {
+    var ruleValue = selectRuleValue(rule);
+    // Epsilon
+    if (ruleValue === '-') {
+        return '';
+    }
+
+    var currentToken = '';
+    for (let i = 0; i < ruleValue.length; i++) {
+        var character = ruleValue[i];
+        if (character === character.toLowerCase()) {
+            currentToken = currentToken + character;
+        } else {
+            currentToken = currentToken + generateTokenFromRule(character);
+        }
+    }
+
+    return currentToken;
+}
+
+function selectRuleValue(rule) {
+    var possibleValues = [];
+    var mapValues = parsingMap.get(rule);
+
+    if (mapValues.some(e => e === '-')) {
+        var epsilonChance = Math.random();
+        if (epsilonChance > TOKEN_LENGTH_RATE) {
+            return '-';
+        }
+    }
+
+    for (let i = 0; i < mapValues.length; i++) {
+        var value = mapValues[i];
+        if (value === '' || value === '-') {
+            continue;
+        }
+
+        possibleValues.push(value);
+    }
+
+    var chosenIndex = randomIntFromInterval(0, possibleValues.length - 1);
+    return possibleValues[chosenIndex];
+}
+
+function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function rule(key, char) {
@@ -117,13 +185,13 @@ function rule(key, char) {
 function writeParsingTable() {
     var parsingTable = document.getElementById('parsing-table');
 
-    var existingBody = document.getElementById(parsingTableBodyId);
+    var existingBody = document.getElementById(PARSING_TABLE_BODY_ID);
     if (typeof (existingBody) != 'undefined' && existingBody != null) {
         existingBody.remove();
     }
 
     var tableBody = document.createElement('tbody');
-    tableBody.id = parsingTableBodyId;
+    tableBody.id = PARSING_TABLE_BODY_ID;
 
     for (let i = 0; i < stackes.length; i++) {
         var row = document.createElement('tr');
